@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VMM", "VMM\VMM.csproj", "{4BE481B3-7088-406A-89AE-6EDBE485EAAF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4BE481B3-7088-406A-89AE-6EDBE485EAAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BE481B3-7088-406A-89AE-6EDBE485EAAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BE481B3-7088-406A-89AE-6EDBE485EAAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BE481B3-7088-406A-89AE-6EDBE485EAAF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
