@@ -109,7 +109,7 @@ namespace VMM
                                 //get block at that xy
                                 for (int x = 0; x < 17; x++)
                                 {
-                                    int btr = (c * (16 * 17)) + (cy * (17*256)) + (cx * 17);
+                                    int btr = (c * (256*17)) + (cy * (17*16)) + (cx * 17);
                                     int btw = cy * (16*17) + x; 
                                    
                                     chunk1[btw] = dataNew[btr];
