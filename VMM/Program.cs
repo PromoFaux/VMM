@@ -13,6 +13,8 @@ namespace VMM
     {
         static void Main(string[] args)
         {
+            Console.WriteLine(5 / 4);
+
             string newDir = @"E:\voxel\new";
             string curDir = @"E:\voxel\current";
             string merDir = @"E:\voxel\merged";
@@ -58,15 +60,41 @@ namespace VMM
                     BinaryReader bNew = new BinaryReader(File.Open(extract + "\\datanew", FileMode.Open));
 
                     int pos = 0;
+
                     int length = (int)bOld.BaseStream.Length;
-
-
-                    var coord1 = new byte[17];
-                    var coord2 = new byte[17];
                     byte[] dataOld = bOld.ReadBytes(length);
                     byte[] dataNew = bNew.ReadBytes(length);
-                    byte[] dataMerged = new byte[dataNew.Length];
-                    bool somethingChanged = false;
+                    byte[] dataMerged = new byte[length];
+                    
+                    List<byte[]> tmpNew = ConvertToRows(dataNew);
+                    List<byte[]> tmpOld = ConvertToRows(dataOld);
+                    
+                    int reqChunk = 18;
+
+                    int xOff = (reqChunk % 16) * (17 * 16);
+                    int yOff = (reqChunk / 16) * 16 ;
+
+                    int yAt = 0;
+                    for (int i = 0; i < 16; i++)
+                    {
+
+                        for (int z = 0; z < 16 * 17; z ++)
+                        {
+                            //chunk[z + (yAt * (16*17))] = tmpOld[yOff][xOff + z];
+                            tmpOld[yOff+yAt][xOff+z]= tmpNew[yOff+yAt][xOff + z];
+                        }
+                        yAt += 1;
+                    }
+
+                    for (int z=0;z<256;z++)
+                    {
+                        Array.Copy(tmpOld[z], 0, dataMerged, z * (17 * 256), 17 * 256);
+                    }
+
+                    //THEN save "dataMerged" to file and zip up
+                    
+                    Console.WriteLine("chunk grabbed");
+
                     //this will read block by block
                     //for (int i = 0; i < dataOld.Length; i += 17)
                     //{
@@ -93,55 +121,21 @@ namespace VMM
                     //        coord2.CopyTo(dataMerged, i);
                     //    }                      
                     //}
-
-                    //lets read chunk by chunk
-                    //256 chunks in data file
-                    var chunk1 = new byte[256 * 17];
-                    var chunk2 = new byte[256 * 17];
-                    for (int c = 0; c < 256; c++)
-                    {
-                        //y
-                        for (int cy = 0; cy < 16; cy++)
-                        {
-                            //x
-                            for (int cx = 0; cx < 16; cx++)
-                            {
-                                //get block at that xy
-                                for (int x = 0; x < 17; x++)
-                                {
-                                    int btr = (c * (256*17)) + (cy * (17*16)) + (cx * 17);
-                                    int btw = cy * (16*17) + x; 
-                                   
-                                    chunk1[btw] = dataNew[btr];
-                                    chunk2[btw] = dataOld[btr];
-                                }
-                               
-                            }
-                        }
-                        //should now have a chunk
-                        if (!chunk1.SequenceEqual(chunk2))
-                        {
-                            Console.WriteLine("MISMATCHED CHUNK");
-                        }
-
-
-                    }
-
-
+                    
                     bOld.Dispose();
                     bNew.Dispose();
 
                     File.Delete(extract + "\\datanew");
                     File.Delete(extract + "\\dataold");
 
-                    if (somethingChanged)
-                    {
-                        Console.WriteLine("Changes Made: " + f.Name);
-                        File.WriteAllBytes(extract + "\\data", dataMerged);
-                        File.Delete(dirMer + "\\" + f.Name);
-                        ZipFile.CreateFromDirectory(extract, dirMer + "\\" + f.Name);
-                        File.Delete(extract + "\\data");
-                    }
+                    //if (somethingChanged)
+                    //{
+                    //    Console.WriteLine("Changes Made: " + f.Name);
+                    //    File.WriteAllBytes(extract + "\\data", dataMerged);
+                    //    File.Delete(dirMer + "\\" + f.Name);
+                    //    ZipFile.CreateFromDirectory(extract, dirMer + "\\" + f.Name);
+                    //    File.Delete(extract + "\\data");
+                    //}
 
                 }
                 else
@@ -158,6 +152,36 @@ namespace VMM
             //}
         }
 
+        public static byte[] Combine(params byte[][] arrays)
+        {
+            byte[] ret = new byte[arrays.Sum(x => x.Length)];
+            int offset = 0;
+            foreach (byte[] data in arrays)
+            {
+                Buffer.BlockCopy(data, 0, ret, offset, data.Length);
+                offset += data.Length;
+            }
+            return ret;
+        }
+
+        public static List<byte[]> ConvertToRows(byte[] inArray)
+        {
+            List<byte[]> outListArray = new List<Byte[]>();
+
+            for(int x=0; x < inArray.Length; x+=17*256)
+            {
+                byte[] tmp = new byte[17 * 256];
+                for (int z = 0; z < 17 * 256; z++) 
+                {
+                    tmp[z] = inArray[z + x];
+                }
+                
+                outListArray.Add(tmp);
+            }
+
+            return outListArray;
+        }
+
 
         public static void PrintByteArray(byte[] bytes)
         {
@@ -171,6 +195,10 @@ namespace VMM
         }
 
 
+
+
     }
 
 }
+
+
