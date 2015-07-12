@@ -67,32 +67,60 @@ namespace VMM
                     byte[] dataNew = bNew.ReadBytes(length);
                     byte[] dataMerged = new byte[dataNew.Length];
                     bool somethingChanged = false;
+                    //this will read block by block
+                    //for (int i = 0; i < dataOld.Length; i += 17)
+                    //{
+                    //    for (int x = 0; x < 17; x++)
+                    //    {
+                    //        coord1[x] = dataNew[i + x];
+                    //        coord2[x] = dataOld[i + x];                           
+                    //    }
 
-                    for (int i = 0; i < dataOld.Length; i += 17)
+                    //    if (!coord1.SequenceEqual(coord2) && !(coord1.SequenceEqual(empty)))
+                    //    {
+                    //        if (newMd > oldMd)
+                    //        {
+                    //            coord1.CopyTo(dataMerged, i);
+                    //            somethingChanged = true;
+                    //        }
+                    //        else
+                    //        {
+                    //            coord2.CopyTo(dataMerged, i);
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        coord2.CopyTo(dataMerged, i);
+                    //    }                      
+                    //}
+
+                    //lets read chunk by chunk
+                    //256 chunks in data file
+                    var chunk1 = new byte[256 * 17];
+                    var chunk2 = new byte[256 * 17];
+                    for (int ch = 0; ch < 256; ch++)
                     {
-                        for (int x = 0; x < 17; x++)
+                        //row
+                        for (int cr = 0; cr < 16; cr++)
                         {
-                            coord1[x] = dataNew[i + x];
-                            coord2[x] = dataOld[i + x];                           
+                            //block
+                            for (int co = 0; co < 16; co++)
+                            {
+                                int ctr = cr * 256 + co;
+                                int ctw = cr * 16 + co;
+                                chunk1[ctw] = dataNew[ctr];
+                                chunk2[ctw] = dataOld[ctr];
+                            }
+                        }
+                        //should now have a chunk
+                        if (!chunk1.SequenceEqual(chunk2))
+                        {
+                            Console.WriteLine("MISMATCHED CHUNK");
                         }
 
-                        if (!coord1.SequenceEqual(coord2) && !(coord1.SequenceEqual(empty)))
-                        {
-                            if (newMd > oldMd)
-                            {
-                                coord1.CopyTo(dataMerged, i);
-                                somethingChanged = true;
-                            }
-                            else
-                            {
-                                coord2.CopyTo(dataMerged, i);
-                            }
-                        }
-                        else
-                        {
-                            coord2.CopyTo(dataMerged, i);
-                        }                      
+
                     }
+
 
                     bOld.Dispose();
                     bNew.Dispose();
@@ -123,7 +151,7 @@ namespace VMM
             //    File.Delete(fM.FullName);
             //}
         }
-      
+
 
         public static void PrintByteArray(byte[] bytes)
         {
@@ -136,7 +164,7 @@ namespace VMM
             Console.WriteLine(sb.ToString());
         }
 
-     
+
     }
 
 }
