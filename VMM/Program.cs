@@ -98,18 +98,24 @@ namespace VMM
                     //256 chunks in data file
                     var chunk1 = new byte[256 * 17];
                     var chunk2 = new byte[256 * 17];
-                    for (int ch = 0; ch < 256; ch++)
+                    for (int c = 0; c < 256; c++)
                     {
-                        //row
-                        for (int cr = 0; cr < 16; cr++)
+                        //y
+                        for (int cy = 0; cy < 16; cy++)
                         {
-                            //block
-                            for (int co = 0; co < 16; co++)
+                            //x
+                            for (int cx = 0; cx < 16; cx++)
                             {
-                                int ctr = cr * 256 + co;
-                                int ctw = cr * 16 + co;
-                                chunk1[ctw] = dataNew[ctr];
-                                chunk2[ctw] = dataOld[ctr];
+                                //get block at that xy
+                                for (int x = 0; x < 17; x++)
+                                {
+                                    int btr = (c * (16 * 17)) + (cy * (17*256)) + (cx * 17);
+                                    int btw = cy * (16*17) + x; 
+                                   
+                                    chunk1[btw] = dataNew[btr];
+                                    chunk2[btw] = dataOld[btr];
+                                }
+                               
                             }
                         }
                         //should now have a chunk
